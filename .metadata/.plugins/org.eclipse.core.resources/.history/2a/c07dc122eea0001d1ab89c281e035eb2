@@ -1,0 +1,19 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+class Algoritmo2 {
+	public static void main(String[] args) throws IOException{
+		String kata;
+		StringBuffer teks = new StringBuffer ();
+		Algoritmo car;
+		System.out.println(" Masukkan Kalimat: ");
+		InputStreamReader kt = new InputStreamReader (System.in);
+		BufferedReader br = new BufferedReader (kt);
+		teks.append(br.readLine());
+		System.out.println("\n\nMasukkan Kata yang di cari: ");
+		kata= br.readLine();
+		car = new Algoritmo(teks,kata);
+		System.out.println("Hasilnya adalah : "+ car.find()+"\n");
+	}
+}

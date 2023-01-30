@@ -1,0 +1,150 @@
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class Apriori {
+	List<Set<String>> allFrequentSet=new ArrayList<Set<String>>();
+	List<Set<String>> data=new ArrayList<Set<String>>();
+	double minSupport;
+	double confidence;
+	public Apriori(List<Set<String>> data,double minSupport,double confidence) {
+		this.data=data;
+		this.minSupport=minSupport;
+		this.confidence=confidence;
+		List<Set<String>> itemSet = createItemSet(data);
+		List<Set<String>> sc=null;
+		int k=0;
+		while(!itemSet.isEmpty()) {
+			System.out.println("K \t:"+(++k));
+			System.out.println("itemSet:"+itemSet);
+			Map<Set<String>, Integer> frequent = frequentSet(itemSet,this.data);
+			System.out.println("frequent:"+frequent);
+			sc = scan(frequent,this.minSupport);
+			System.out.println("scan"+sc);
+			itemSet=candidateSet(sc);
+		}
+		associationRules(sc);
+	
+	}
+	
+	//Reglas de asociación
+	public void associationRules(List<Set<String>> sc) {
+		System.out.println("lk \ t \ t regla de asociación \ t \ t confianza \ t apoyo \ t es una regla fuerte");
+		sc.forEach(set->{
+			List<Set<String>> subset = nonEmptySubset(set);
+			int y=support(set,data);
+			double support = 1.0*y/data.size();
+			subset.forEach(sub->{
+				int x=support(sub,data);
+				HashSet<String> target = new HashSet<String>(set);
+				target.removeAll(sub);
+				double conf = 1.0*y/x;
+				System.out.println(set+"\t"+sub+"-->"+target+
+						"\t"+y+"/"+x+"("+String.format("%.2f", conf)+")\t"+
+						y+"/"+data.size()+"("+String.format("%.2f", support)+
+						")\t"+(conf>this.confidence));
+			});
+		});
+	}
+	// Calcula el soporte de conjuntos de elementos frecuentes
+	public Integer support(Set<String> set,List<Set<String>> data){
+		return  (int) data.stream()
+				.filter(d->d.containsAll(set))
+				.count();
+	}
+	// Generar conjunto de candidatos
+	// Un algoritmo debería ser ordenar el conjunto de candidatos de acuerdo con ciertas reglas, fusionar los dos conjuntos con solo el último elemento diferente
+	// Comprensión personal:
+	// Para cualquier conjunto frecuente A y B pertenecen a S. Si C = A y B es frecuente, entonces D = C- (A cruza B) también es frecuente
+	public  List<Set<String>> candidateSet(List<Set<String>> list) {// Conjunto de candidatos
+		List<Set<String>> candidate=new ArrayList<Set<String>>();
+		for(int i=0;i<list.size();i++) {
+			for(int j=i+1;j<list.size();j++) {
+				Set<String> item = list.get(i);
+				Set<String> compare = list.get(j);
+				if(item.size()==1){
+					Set<String> unionn=new HashSet<String>(item);
+					unionn.addAll(compare);
+					candidate.add(unionn);
+				}else{
+					Set<String> intersection=new HashSet<String>(item);
+					intersection.retainAll(compare);
+					if(!intersection.isEmpty()) {
+						Set<String> unionn=new HashSet<String>(item);
+						unionn.addAll(compare);
+						Set<String> difference =new HashSet<String>(unionn);
+						difference.removeAll(intersection);
+						if(allFrequentSet.contains(difference)) {
+							candidate.add(unionn);
+						}
+					}
+				}
+			}
+		}
+		candidate = candidate.stream().distinct().collect(Collectors.toList());
+		return candidate;
+	}
+	// Escanee conjuntos de elementos frecuentes que cumplan con el soporte mínimo
+	public  List<Set<String>> scan(Map<Set<String>, Integer> frequent,double minSupport) {
+		List<Set<String>> list=new ArrayList<Set<String>>();
+		for(Set<String> key :frequent.keySet()) {
+			if(frequent.get(key)>=minSupport*data.size()) {
+				list.add(key);
+				allFrequentSet.add(key);
+			}
+		}
+		return list;
+	}
+	// Establecer una relación de mapeo entre conjuntos de elementos frecuentes y soporte
+	public  Map<Set<String>, Integer> frequentSet(List<Set<String>> candidate,List<Set<String>> data) {// Conjuntos de elementos frecuentes
+		Map<Set<String>,Integer> frequent=new HashMap();
+		candidate.forEach(can->{
+			Integer sup = support(can,data);
+			frequent.put(can,sup);
+		});
+		return  frequent;
+	}
+	// Crear conjunto de transacciones
+	public  List<Set<String>> createItemSet(List<Set<String>> data) {
+		List<Set<String>> itemSet=new ArrayList< Set<String> >();
+		Set<String> set =new HashSet<String>();
+		data.forEach(set::addAll);
+		set.forEach(e->itemSet.add(new HashSet<String>() {{add(e);}}));
+		return itemSet;
+	}
+	// Obtiene todos los subconjuntos verdaderos no vacíos de un conjunto dado
+	public  List<Set<String>>  nonEmptySubset(Set<String> set){
+		List<Set<String>> list =new ArrayList<Set<String>>();
+		List<HashSet<String>> arr = set.stream()
+				.map(s->new HashSet<String>() {{add(s);}})
+				.collect(Collectors.toList());
+		// Subconjunto número 2 ^ n 
+		// Recorre cada bit de la secuencia binaria, si es "1", mantenlo
+		int max=(int) Math.pow(2,arr.size());
+		for(int i=0;i<max;i++) {
+			Set<String> tmp =new HashSet<String>();
+			String bt = Integer.toBinaryString(i);
+			while(arr.size()>bt.length()) {
+				bt="0"+bt;
+			}
+			for(int j=0;j<arr.size()&&j<bt.length();j++) {
+				if(bt.charAt(j)=='1') {
+					tmp.addAll(arr.get(j));
+				}
+			}
+			if(!tmp.isEmpty()&&!tmp.containsAll(set)) {
+				list.add(tmp);
+			}
+		}
+		return list;
+	}
+}
+
+
+
