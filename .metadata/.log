@@ -5429,3 +5429,18 @@ java.util.concurrent.TimeoutException
 	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:659)
 	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:596)
 	at org.eclipse.equinox.launcher.Main.run(Main.java:1467)
+
+!ENTRY org.eclipse.lsp4e 1 0 2023-01-30 20:51:38.748
+!MESSAGE [Info]	ESLint server running in node v18.12.1
+
+!ENTRY org.eclipse.lsp4e 1 0 2023-01-30 20:51:39.205
+!MESSAGE [Info]	No ES Libary found for file: file:///C:/SpringCloud/Workspace/eureka-service/src/main/resources/bootstrap.yaml
+
+!ENTRY org.eclipse.lsp4e 1 0 2023-01-30 20:51:45.098
+!MESSAGE [Info]	ESLint server running in node v18.12.1
+
+!ENTRY org.eclipse.lsp4e 1 0 2023-01-30 20:51:45.527
+!MESSAGE [Info]	No ES Libary found for file: file:///C:/SpringCloud/Workspace/config-service/src/main/resources/application.yaml
+
+!ENTRY org.eclipse.lsp4e 1 0 2023-01-30 20:54:10.430
+!MESSAGE [Info]	No ES Libary found for file: file:///C:/SpringCloud/Workspace/usuario-service/src/main/resources/bootstrap.yaml
